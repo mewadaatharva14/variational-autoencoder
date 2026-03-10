@@ -16,10 +16,10 @@ import argparse
 import os
 import yaml
 
-
 # ------------------------------------------------------------------
 # Argument parser
 # ------------------------------------------------------------------
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -39,11 +39,11 @@ def parse_args() -> argparse.Namespace:
 # Config loader
 # ------------------------------------------------------------------
 
+
 def load_config(config_path: str) -> dict:
     if not os.path.exists(config_path):
         raise FileNotFoundError(
-            f"\nConfig file not found: {config_path}\n"
-            f"Run from the repo root directory."
+            f"\nConfig file not found: {config_path}\n" f"Run from the repo root directory."
         )
     with open(config_path, "r") as f:
         config = yaml.safe_load(f)
@@ -54,16 +54,18 @@ def load_config(config_path: str) -> dict:
 # Main
 # ------------------------------------------------------------------
 
+
 def main() -> None:
-    args   = parse_args()
+    args = parse_args()
     config = load_config(args.config)
 
     print(f"\n{'='*55}")
     print("  Convolutional VAE — CelebA")
     print(f"  Config : {args.config}")
-    print("="*55)            # ← change to print("="*55)
+    print("=" * 55)  # ← change to print("="*55)
 
     from src import VAETrainer
+
     trainer = VAETrainer(config)
     trainer.train()
 
