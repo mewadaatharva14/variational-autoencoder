@@ -1,0 +1,34 @@
+# ── Model ─────────────────────────────────────────────────────────────
+model:
+  latent_dim:     128
+  base_channels:  32        # encoder: 32 → 64 → 128 → 256
+  image_channels: 3
+  image_size:     128       # input resized to 128x128
+  beta:           1.0       # beta=1 → standard VAE, beta>1 → beta-VAE
+
+# ── Data ──────────────────────────────────────────────────────────────
+data:
+  root:         data/
+  split:        train       # train | valid | test
+  batch_size:   32          # keep small — CelebA images are large
+  num_workers:  2
+  pin_memory:   false       # set true on GPU
+
+# ── Training ──────────────────────────────────────────────────────────
+training:
+  epochs:         10        # 10 epochs CPU-friendly baseline
+                            # increase to 50+ on GPU for quality results
+  lr:             0.0002
+  betas:          [0.9, 0.999]
+  log_interval:   100       # print loss every N batches
+  save_interval:  1         # save sample grid every N epochs
+
+# ── Paths ──────────────────────────────────────────────────────────────
+paths:
+  checkpoint_dir: checkpoints/
+  samples_dir:    samples/
+  assets_dir:     assets/
+
+# ── Reproducibility ────────────────────────────────────────────────────
+reproducibility:
+  random_seed: 42
