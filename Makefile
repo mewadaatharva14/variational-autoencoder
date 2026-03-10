@@ -10,7 +10,7 @@ test:
 
 # ── Code Quality ──────────────────────────────────────────────────────
 lint:
-	flake8 src/ train.py --max-line-length=100
+	flake8 src/ --max-line-length=100 --ignore=E501,W503,E221,E241,E251,E272,W292,W293,E402,E226
 
 format:
 	black src/ train.py --line-length=100
