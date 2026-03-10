@@ -50,33 +50,33 @@ class ConvVAE(nn.Module):
 
     def __init__(
         self,
-        latent_dim:     int   = 128,
-        base_channels:  int   = 32,
-        image_channels: int   = 3,
-        image_size:     int   = 128,
-        beta:           float = 1.0,
+        latent_dim: int = 128,
+        base_channels: int = 32,
+        image_channels: int = 3,
+        image_size: int = 128,
+        beta: float = 1.0,
     ) -> None:
         super().__init__()
 
         self.beta = beta
 
         self.encoder = Encoder(
-            latent_dim     = latent_dim,
-            base_channels  = base_channels,
-            image_channels = image_channels,
-            image_size     = image_size,
+            latent_dim=latent_dim,
+            base_channels=base_channels,
+            image_channels=image_channels,
+            image_size=image_size,
         )
 
         self.decoder = Decoder(
-            latent_dim     = latent_dim,
-            base_channels  = base_channels,
-            image_channels = image_channels,
-            image_size     = image_size,
+            latent_dim=latent_dim,
+            base_channels=base_channels,
+            image_channels=image_channels,
+            image_size=image_size,
         )
 
     def reparameterize(
         self,
-        mu:      torch.Tensor,
+        mu: torch.Tensor,
         log_var: torch.Tensor,
     ) -> torch.Tensor:
         """
@@ -93,9 +93,9 @@ class ConvVAE(nn.Module):
         -------
         z : (B, latent_dim)
         """
-        std = torch.exp(0.5 * log_var)      # sigma = exp(0.5 * log_var)
-        eps = torch.randn_like(std)          # eps ~ N(0, 1), same shape as std
-        return mu + std * eps               # z = mu + sigma * eps
+        std = torch.exp(0.5 * log_var)  # sigma = exp(0.5 * log_var)
+        eps = torch.randn_like(std)  # eps ~ N(0, 1), same shape as std
+        return mu + std * eps  # z = mu + sigma * eps
 
     def forward(
         self,
@@ -112,16 +112,16 @@ class ConvVAE(nn.Module):
         mu      : (B, latent_dim)  — latent mean
         log_var : (B, latent_dim)  — latent log variance
         """
-        mu, log_var = self.encoder(x)       # encode → distribution
-        z           = self.reparameterize(mu, log_var)  # sample z
-        x_recon     = self.decoder(z)       # decode → reconstruction
+        mu, log_var = self.encoder(x)  # encode → distribution
+        z = self.reparameterize(mu, log_var)  # sample z
+        x_recon = self.decoder(z)  # decode → reconstruction
         return x_recon, mu, log_var
 
     def loss(
         self,
-        x:       torch.Tensor,
+        x: torch.Tensor,
         x_recon: torch.Tensor,
-        mu:      torch.Tensor,
+        mu: torch.Tensor,
         log_var: torch.Tensor,
     ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         """
@@ -141,15 +141,11 @@ class ConvVAE(nn.Module):
         kl_loss    : scalar — for logging
         """
         # reconstruction — BCE summed over pixels, averaged over batch
-        recon_loss = F.binary_cross_entropy(
-            x_recon, x, reduction="sum"
-        ) / x.size(0)
+        recon_loss = F.binary_cross_entropy(x_recon, x, reduction="sum") / x.size(0)
 
         # KL divergence — closed form for Gaussian vs N(0,1)
         # -0.5 * sum(1 + log_var - mu² - exp(log_var))
-        kl_loss = -0.5 * torch.sum(
-            1 + log_var - mu.pow(2) - log_var.exp()
-        ) / x.size(0)
+        kl_loss = -0.5 * torch.sum(1 + log_var - mu.pow(2) - log_var.exp()) / x.size(0)
 
         total_loss = recon_loss + self.beta * kl_loss
 
@@ -158,7 +154,7 @@ class ConvVAE(nn.Module):
     def sample(
         self,
         num_samples: int,
-        device:      torch.device,
+        device: torch.device,
     ) -> torch.Tensor:
         """
         Generate new face images by sampling z ~ N(0, 1).
@@ -177,4 +173,3 @@ class ConvVAE(nn.Module):
 
     def count_parameters(self) -> int:
         return sum(p.numel() for p in self.parameters() if p.requires_grad)
-        
